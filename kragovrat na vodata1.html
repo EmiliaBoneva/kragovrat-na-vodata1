@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кръговрат на водата - Образователна игра</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            text-align: center;
+        }
+        #game-container {
+            width: 60%;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0px 0px 10px #888;
+            border-radius: 8px;
+        }
+        #hero {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        #hero img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+        #score {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .question {
+            font-weight: bold;
+        }
+        .answer {
+            padding: 10px;
+            margin: 5px;
+            background-color: #f2f2f2;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .answer.correct {
+            background-color: #d4edda;
+        }
+        .answer.incorrect {
+            background-color: #f8d7da;
+        }
+        #next-button {
+            display: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            font-size: 1em;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #result {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="hero">
+        <img src="C:\Users\ЕмилияГБонева\Downloads\Designer (3).jpeg" alt="Момиче-изследовател">
+        <div id="score">Точки: 0</div>
+    </div>
+    
+    <div id="question-container">
+        <div id="question" class="question"></div>
+        <div id="answers"></div>
+    </div>
+
+    <button id="next-button" onclick="nextQuestion()">Следващ въпрос</button>
+    <div id="result"></div>
+</div>
+
+<script>
+    const questions = [
+        { question: "Какво е изпарение?", answers: ["Превръщането на водата в облаци", "Превръщането на водата в пара", "Превръщането на парата в капки вода"], correct: 1 },
+        { question: "Кое от следните се случва след изпарението?", answers: ["Водата замръзва", "Парата се кондензира в облаци", "Водата се влива в реки"], correct: 1 },
+        { question: "Какво е кондензация?", answers: ["Превръщането на водата в пара", "Превръщането на водните пари в капчици", "Изтичане на водата от облаците"], correct: 1 },
+        { question: "Какво представляват облаците?", answers: ["Събрани водни капчици", "Големи ледени късове", "Капки вода, стичащи се от небето"], correct: 0 },
+        { question: "Как се нарича процесът, при който водата пада обратно на земята като дъжд, сняг или градушка?", answers: ["Топене", "Изпарение", "Валеж"], correct: 2 },
+        { question: "Какво се случва, когато водата попие в почвата?", answers: ["Води до изпарение", "Създава подземни води", "Се кондензира в облаци"], correct: 1 },
+        { question: "Какво означава 'кръговрат на водата'?", answers: ["Постоянно циркулиране на водата в природата", "Постоянно дъжд в планините", "Водата се движи само по реките"], correct: 0 },
+        { question: "Какво е основният източник на енергия за изпарението?", answers: ["Лунната светлина", "Слънчевата енергия", "Земната гравитация"], correct: 1 },
+        { question: "Къде отива водата след валеж?", answers: ["В реките и моретата", "В планините", "Остава в облаците"], correct: 0 },
+        { question: "Какво правят растенията с водата, която поглъщат?", answers: ["Използват я само за охлаждане", "Изпаряват част от нея чрез листата", "Запазват я само в корените"], correct: 1 }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    function loadQuestion() {
+        const question = questions[currentQuestionIndex];
+        document.getElementById("question").innerText = question.question;
+        document.getElementById("answers").innerHTML = "";
+
+        question.answers.forEach((answer, index) => {
+            const answerDiv = document.createElement("div");
+            answerDiv.classList.add("answer");
+            answerDiv.innerText = answer;
+            answerDiv.onclick = () => checkAnswer(index);
+            document.getElementById("answers").appendChild(answerDiv);
+        });
+    }
+
+    function checkAnswer(selectedIndex) {
+        const question = questions[currentQuestionIndex];
+        const answers = document.getElementsByClassName("answer");
+
+        if (selectedIndex === question.correct) {
+            answers[selectedIndex].classList.add("correct");
+            score++;
+            document.getElementById("score").innerText = `Точки: ${score}`;
+        } else {
+            answers[selectedIndex].classList.add("incorrect");
+            answers[question.correct].classList.add("correct");
+        }
+
+        Array.from(answers).forEach(answer => {
+            answer.onclick = null;  // Деактивиране на отговорите след избор
+        });
+
+        document.getElementById("next-button").style.display = "block";
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+
+        if (currentQuestionIndex < questions.length) {
+            document.getElementById("next-button").style.display = "none";
+            loadQuestion();
+        } else {
+            showFinalResult();
+        }
+    }
+
+    function showFinalResult() {
+        document.getElementById("question-container").style.display = "none";
+        document.getElementById("next-button").style.display = "none";
+        document.getElementById("result").innerHTML = `Вие събрахте общо ${score} точки. `;
+
+        if (score >= 9) {
+            document.getElementById("result").innerHTML += "Справихте се отлично! 😊";
+        } else if (score >= 7) {
+            document.getElementById("result").innerHTML += "Справихте се много добре! 😊";
+        } else if (score >= 5) {
+            document.getElementById("result").innerHTML += "Справихте се добре! 😊";
+        } else {
+            document.getElementById("result").innerHTML += "Прочети още по темата и играй отново! 😞";
+        }
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
